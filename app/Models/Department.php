@@ -18,5 +18,10 @@ class Department extends Model
     {
         return $this->hasMany(Student::class);
     }
+
+    public function results()
+    {
+        return $this->hasManyThrough(Result::class, Student::class);
+    }
 }
 
