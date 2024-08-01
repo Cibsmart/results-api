@@ -13,5 +13,10 @@ class Department extends Model
             'options' => 'array',
         ];
     }
+
+    public function students()
+    {
+        return $this->hasMany(Student::class);
+    }
 }
 
