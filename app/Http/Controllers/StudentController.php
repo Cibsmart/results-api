@@ -12,9 +12,11 @@ class StudentController extends Controller
 {
     public function index()
     {
+        $students = Student::query()->limit(10000)->get();
+
         return $this->respondWithSuccess(
-            data: StudentResource::collection(Student::query()->limit(10000)->get()),
-            message: 'success',
+            data: StudentResource::collection($students),
+            message: $students->count(),
         );
     }
 

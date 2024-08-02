@@ -9,9 +9,11 @@ class DepartmentController extends Controller
 {
     public function index()
     {
+        $departments = Department::all();
+
         return $this->respondWithSuccess(
-            data: DepartmentResource::collection(Department::all()),
-            message: 'success',
+            data: DepartmentResource::collection($departments),
+            message: $departments->count(),
         );
     }
 }
