@@ -12,7 +12,7 @@ class StudentController extends Controller
 {
     public function index()
     {
-        $students = Student::query()->limit(10000)->get();
+        $students = Student::query()->limit(100)->get();
 
         return $this->respondWithSuccess(
             data: StudentResource::collection($students),
@@ -44,9 +44,9 @@ class StudentController extends Controller
         );
     }
 
-    public function studentsByDepartmentAndAdmissionYear(Department $department, string $admissionYear)
+    public function studentsByDepartmentAndSession(Department $department, string $session)
     {
-        $session = $admissionYear . '/' . (int) $admissionYear + 1;
+        $session = Str::replace('-', '/', $session);
 
         $students = $department->students()
             ->where('entry_session', $session)
@@ -59,9 +59,9 @@ class StudentController extends Controller
 
     }
 
-    public function studentsByAdmissionYear(string $admissionYear)
+    public function studentsBySession(string $session)
     {
-        $session = $admissionYear . '/' . (int) $admissionYear + 1;
+        $session = Str::replace('-', '/', $session);
 
         $students = Student::query()
             ->where('entry_session', $session)

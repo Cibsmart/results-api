@@ -14,7 +14,7 @@ class ResultController extends Controller
     public function index()
     {
         return $this->respondWithSuccess(
-            data: ResultResource::collection(Result::query()->limit(10000)->get()),
+            data: ResultResource::collection(Result::query()->limit(100)->get()),
             message: 'success',
         );
     }
