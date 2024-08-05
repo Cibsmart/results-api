@@ -20,17 +20,6 @@ class StudentController extends Controller
         );
     }
 
-    public function studentById(string $id)
-    {
-        return $this->respondWithSuccess(
-            data: new StudentResource(Student::query()
-                ->where('id', $id)
-                ->firstOrFail()
-            ),
-            message: 'success',
-        );
-    }
-
     public function studentByRegistrationNumber(string $registrationNumber)
     {
         $registrationNumber = Str::replace('-', '/', $registrationNumber);

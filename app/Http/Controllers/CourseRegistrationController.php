@@ -2,35 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\CourseRegistrationResource;
 use App\Http\Resources\ResultResource;
 use App\Models\Department;
 use App\Models\Result;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
-class ResultController extends Controller
+class CourseRegistrationController extends Controller
 {
     public function index()
     {
-        $results = Result::query()->limit(100)->get();
         return $this->respondWithSuccess(
-            data: ResultResource::collection($results),
-            message: $results->count(),
-        );
-    }
-
-    public function resultByCourseRegistrationId(string $courseRegistrationId)
-    {
-        return $this->respondWithSuccess(
-            data: new ResultResource(Result::query()
-                ->where('id', $courseRegistrationId)
-                ->firstOrFail()
-            ),
+            data: CourseRegistrationResource::collection(Result::query()->limit(100)->get()),
             message: 'success',
         );
     }
-//
-    public function resultsByRegistrationNumber(string $registrationNumber)
+
+    public function courseRegistrationsByRegistrationNumber(string $registrationNumber)
     {
         $registrationNumber = Str::replace('-', '/', $registrationNumber);
 
@@ -39,12 +28,12 @@ class ResultController extends Controller
             ->get();
 
         return $this->respondWithSuccess(
-            data: ResultResource::collection($results),
+            data: CourseRegistrationResource::collection($results),
             message: $results->count(),
         );
     }
 
-    public function resultsByDepartmentSessionAndSemester(
+    public function courseRegistrationsByDepartmentSessionAndSemester(
         Department $department,
         string $session,
         string $semester
@@ -58,13 +47,13 @@ class ResultController extends Controller
             ->get();
 
         return $this->respondWithSuccess(
-            data: ResultResource::collection($results),
+            data: CourseRegistrationResource::collection($results),
             message: $results->count()
         );
 
     }
 
-    public function resultsByDepartmentSessionAndLevel(
+    public function courseRegistrationsByDepartmentSessionAndLevel(
         Department $department,
         string $session,
         string $level
@@ -78,12 +67,12 @@ class ResultController extends Controller
             ->get();
 
         return $this->respondWithSuccess(
-            data: ResultResource::collection($results),
+            data: CourseRegistrationResource::collection($results),
             message: $results->count()
         );
     }
 
-    public function resultsBySessionAndCourse(
+    public function courseRegistrationBySessionAndCourse(
         string $session,
         string $course
     ) {
@@ -97,7 +86,25 @@ class ResultController extends Controller
             ->get();
 
         return $this->respondWithSuccess(
-            data: ResultResource::collection($results),
+            data: CourseRegistrationResource::collection($results),
+            message: $results->count()
+        );
+    }
+
+    public function courseRegistrationBySessionAndSemester(
+        string $session,
+        string $semester
+    ) {
+
+        $session = Str::replace('-', '/', $session);
+
+        $results = Result::query()
+            ->where('session', $session)
+            ->where('semester', $semester)
+            ->get();
+
+        return $this->respondWithSuccess(
+            data: CourseRegistrationResource::collection($results),
             message: $results->count()
         );
     }

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('registration_number')->index();
             $table->string('session');
             $table->string('semester');
+            $table->string('level');
             $table->string('course_code');
             $table->string('course_title');
             $table->string('credit_unit');
