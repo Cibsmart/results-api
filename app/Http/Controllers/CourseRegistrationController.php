@@ -3,10 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\CourseRegistrationResource;
-use App\Http\Resources\ResultResource;
 use App\Models\Department;
 use App\Models\Result;
-use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class CourseRegistrationController extends Controller

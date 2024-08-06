@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('session');
             $table->string('semester');
             $table->string('level');
+            $table->foreignId('course_id')->constrained('courses');
             $table->string('course_code');
             $table->string('course_title');
             $table->string('credit_unit');

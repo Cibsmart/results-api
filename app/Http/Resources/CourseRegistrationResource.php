@@ -20,8 +20,7 @@ class CourseRegistrationResource extends JsonResource
             'session' => $this->session,
             'semester' => $this->semester,
             'level' => $this->level,
-            'course_code' => $this->course_code,
-            'course_title' => $this->course_title,
+            'course_id' => $this->course->id,
             'credit_unit' => $this->credit_unit,
             'registration_date' => $this->created_at
         ];

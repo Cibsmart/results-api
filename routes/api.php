@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CourseController;
 use App\Http\Controllers\CourseRegistrationController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\ResultController;
@@ -7,6 +8,10 @@ use App\Http\Controllers\StudentController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('departments', [DepartmentController::class, 'index']);
+Route::get('departments/{department}', [DepartmentController::class, 'departmentByCourseId']);
+
+Route::get('courses', [CourseController::class, 'index']);
+Route::get('courses/{course}', [CourseController::class, 'courseByCourseId']);
 
 Route::get('students/', [StudentController::class, 'index']);
 Route::get('students/registration-number/{registrationNumber}',

@@ -16,4 +16,12 @@ class DepartmentController extends Controller
             message: $departments->count(),
         );
     }
+
+    public function departmentByCourseId($id)
+    {
+        return $this->respondWithSuccess(
+            data: new DepartmentResource(Department::query()->findOrFail($id)),
+            message: 'success',
+        );
+    }
 }
