@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Str;
 
 class CourseRegistrationResource extends JsonResource
 {
@@ -14,6 +15,10 @@ class CourseRegistrationResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        [$day, $month, $year] = $this->created_at !== ""
+            ? Str::of($this->created_at->format('d-m-Y'))->explode('-')
+            : ["", "", ""];
+
         return [
             'id' => $this->id,
             'registration_number' => $this->registration_number,
@@ -22,7 +27,7 @@ class CourseRegistrationResource extends JsonResource
             'level' => $this->level,
             'course_id' => $this->course->id,
             'credit_unit' => $this->credit_unit,
-            'registration_date' => $this->created_at
+            'registration_date' => compact('day', 'month', 'year'),
         ];
     }
 }
