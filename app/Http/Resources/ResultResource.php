@@ -20,8 +20,8 @@ class ResultResource extends JsonResource
             : ["", "", ""];
 
         return [
-            'id' => $this->id,
-            'course_registration_id' => $this->id,
+            'id' => (string) $this->id,
+            'course_registration_id' => (string) $this->id,
             'registration_number' => $this->registration_number,
             'in_course' => $this->in_course,
             'exam_score' => $this->exam,

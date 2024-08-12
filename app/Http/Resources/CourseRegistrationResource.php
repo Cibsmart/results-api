@@ -20,12 +20,12 @@ class CourseRegistrationResource extends JsonResource
             : ["", "", ""];
 
         return [
-            'id' => $this->id,
+            'id' => (string) $this->id,
             'registration_number' => $this->registration_number,
             'session' => $this->session,
             'semester' => $this->semester,
             'level' => $this->level,
-            'course_id' => $this->course->id,
+            'course_id' => (string) $this->course->id,
             'credit_unit' => $this->credit_unit,
             'registration_date' => compact('day', 'month', 'year'),
         ];
