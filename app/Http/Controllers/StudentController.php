@@ -6,75 +6,57 @@ use App\Http\Resources\StudentResource;
 use App\Models\Department;
 use App\Models\Student;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class StudentController extends Controller
 {
-    public function index()
-    {
-        $students = Student::query()->limit(100)->get();
+    public const MAPPING = [
+        'registration_number' => 'registration_number',
+        'department_id' => 'department_id',
+        'session' => 'entry_session',
+    ];
 
-        return $this->respondWithSuccess(
+    public function __invoke(Request $request)
+    {
+        $validated = $request->validate([
+            'registration_number' => ['sometimes', 'string', 'regex:/^EBSU\-\d{4}\-\d{4,6}[A-Z]?$/'],
+            'department_id' => ['sometimes', 'string', 'regex:/^[0-9]+$/'],
+            'session' => ['sometimes', 'string', 'regex:/^\d{4}\-\d{4}$/'],
+        ]);
+
+        if(count($validated) === 0){
+            return $this->students();
+        }
+
+        $filter = [];
+
+        foreach($validated as $key => $value){
+            $filter[self::MAPPING[$key]] = Str::replace('-', '/', $value);
+        }
+
+        return $this->filterStudents($filter);
+    }
+
+    private function filterStudents(array $filter)
+    {
+        $students = Student::query()->where($filter)->get();
+
+        return is_null($students)
+            ? $this->respondNotFound('Students not found')
+            : $this->respondWithSuccess(
             data: StudentResource::collection($students),
             message: $students->count(),
         );
     }
 
-    public function studentByRegistrationNumber(string $registrationNumber)
+    private function students(): JsonResponse
     {
-        $registrationNumber = Str::replace('-', '/', $registrationNumber);
+        $students = Student::query()->limit(100)->get();
 
-        return $this->respondWithSuccess(
-            data: new StudentResource(Student::query()
-                ->where('registration_number', $registrationNumber)
-                ->firstOrFail()
-            ),
-            message: 'success',
-        );
-    }
-
-    public function studentsByDepartmentAndSession(Department $department, string $session)
-    {
-        $session = Str::replace('-', '/', $session);
-
-        $students = $department->students()
-            ->where('entry_session', $session)
-            ->get();
-
-        return $this->respondWithSuccess(
-            data: StudentResource::collection($students),
-            message: $students->count()
-        );
-
-    }
-
-    public function studentsBySession(string $session)
-    {
-        $session = Str::replace('-', '/', $session);
-
-        $students = Student::query()
-            ->where('entry_session', $session)
-            ->get();
-
-        return $this->respondWithSuccess(
-            data: StudentResource::collection($students),
-            message: $students->count()
-        );
-
-    }
-
-    public function passportWithId(string $id)
-    {
-        return new JsonResponse(
-            data: ["data" => "lorem ipsum", "status" => true, "message" => "success"],
-        );
-    }
-
-    public function passportWithRegistrationNumber(string $registrationNumber)
-    {
-        return new JsonResponse(
-            data: ["data" => "lorem ipsum", "status" => true, "message" => "success"],
-        );
+        return is_null($students)
+            ? $this->respondNotFound('Students not found')
+            : $this->respondWithSuccess(data: StudentResource::collection($students), message: $students->count());
     }
 
 }
