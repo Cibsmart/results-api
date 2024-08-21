@@ -15,9 +15,7 @@ class StudentResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        [$day, $month, $year] = $this->date_of_birth !== ""
-            ? Str::of($this->date_of_birth)->explode('/')
-            : ["", "", ""];
+        $dateOfBirth = Str::replace('/', '-', $this->date_of_birth);
 
         return [
             "id" => $this->id,
@@ -26,7 +24,7 @@ class StudentResource extends JsonResource
             'other_names' => $this->other_names,
             'registration_number' => $this->registration_number,
             'gender' => $this->gender,
-            'date_of_birth' => compact("day", "month", "year"),
+            'date_of_birth' => $dateOfBirth,
             'department_id' => $this->department_id,
             'option' => $this->option,
             'state' => $this->state,
