@@ -87,13 +87,11 @@ class ResultController extends Controller
         string $session,
         string $course
     ) {
-
         $session = Str::replace('-', '/', $session);
-        $course = Str::replace('-', ' ', $course);
 
         $results = Result::query()
             ->where('session', $session)
-            ->where('course_code', $course)
+            ->where('course_id', $course)
             ->get();
 
         return $this->respondWithSuccess(

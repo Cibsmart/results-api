@@ -76,11 +76,10 @@ class CourseRegistrationController extends Controller
     ) {
 
         $session = Str::replace('-', '/', $session);
-        $course = Str::replace('-', ' ', $course);
 
         $results = Result::query()
             ->where('session', $session)
-            ->where('course_code', $course)
+            ->where('course_id', $course)
             ->get();
 
         return $this->respondWithSuccess(
