@@ -4,24 +4,39 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\CourseResource;
 use App\Models\Course;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class CourseController extends Controller
 {
-    public function index()
+    public function __invoke(Request $request)
     {
-        $course = Course::all();
+        $data = $request->validate([
+            'course_id' => ['sometimes', 'string', 'regex:/^[0-9]+$/'],
+        ]);
 
-        return $this->respondWithSuccess(
-            data: CourseResource::collection($course),
-            message: $course->count(),
-        );
+        if(count($data) === 0) {
+            return $this->courses();
+        }
+
+        return $this->courseById($data['course_id']);
     }
 
-    public function courseByCourseId($id)
+    private function courseById($id)
     {
-        return $this->respondWithSuccess(
-            data: new CourseResource(Course::query()->findOrFail($id)),
-            message: 'success',
-        );
+        $course = Course::query()->findOrFail($id);
+
+        return is_null($course)
+            ? $this->respondNotFound("Course not found")
+            : $this->respondWithSuccess(data: new CourseResource($course), message: 'success');
+    }
+
+    private function courses(): JsonResponse
+    {
+        $courses = Course::all();
+
+        return is_null($courses)
+            ? $this->respondNotFound("Courses not found")
+            : $this->respondWithSuccess(data: CourseResource::collection($courses), message: $courses->count());
     }
 }

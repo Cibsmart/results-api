@@ -21,26 +21,20 @@ class DepartmentController extends Controller
         return $this->departmentById($data['department_id']);
     }
 
-    public function departments(){
+    private function departments(){
         $departments = Department::all();
 
         return is_null($departments)
             ? $this->respondNotFound("Departments not found")
-            : $this->respondWithSuccess(
-            data: DepartmentResource::collection($departments),
-            message: $departments->count(),
-        );
+            : $this->respondWithSuccess(data: DepartmentResource::collection($departments), message: $departments->count(),);
     }
 
-    public function departmentById($id)
+    private function departmentById($id)
     {
         $department = Department::query()->find($id);
 
         return is_null($department)
             ? $this->respondNotFound("Department not found")
-            :$this->respondWithSuccess(
-            data: new DepartmentResource($department),
-            message: 'success',
-        );
+            : $this->respondWithSuccess(data: new DepartmentResource($department), message: 'success');
     }
 }

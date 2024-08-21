@@ -9,8 +9,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('departments', DepartmentController::class);
 
-Route::get('courses', [CourseController::class, 'index']);
-Route::get('courses/{course}', [CourseController::class, 'courseByCourseId']);
+Route::get('courses', CourseController::class);
 
 Route::get('students/', [StudentController::class, 'index']);
 Route::get('students/registration-number/{registrationNumber}',
