@@ -18,17 +18,4 @@ Route::get('students/passport', PassportController::class);
 
 Route::get('course-registrations', CourseRegistrationController::class);
 
-
-Route::get('results/', [ResultController::class, 'index']);
-Route::get('results/course-registration/{courseRegistrationId}',
-    [ResultController::class, 'resultByCourseRegistrationId']);
-Route::get('results/registration-number/{registrationNumber}',
-    [ResultController::class, 'resultsByRegistrationNumber']);
-Route::get('results/department/{department}/session/{session}/semester/{semester}',
-    [ResultController::class, 'resultsByDepartmentSessionAndSemester']);
-Route::get('results/department/{department}/session/{session}/level/{level}',
-    [ResultController::class, 'resultsByDepartmentSessionAndLevel']);
-Route::get('results/session/{session}/course/{course}',
-    [ResultController::class, 'resultsBySessionAndCourse']);
-Route::get('results/session/{session}/semester/{semester}',
-    [ResultController::class, 'resultsBySessionAndSemester']);
+Route::get('results', ResultController::class);
