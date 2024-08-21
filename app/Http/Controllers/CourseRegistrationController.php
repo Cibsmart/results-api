@@ -5,104 +5,64 @@ namespace App\Http\Controllers;
 use App\Http\Resources\CourseRegistrationResource;
 use App\Models\Department;
 use App\Models\Result;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class CourseRegistrationController extends Controller
 {
-    public function index()
+    public function __invoke(Request $request)
     {
-        return $this->respondWithSuccess(
-            data: CourseRegistrationResource::collection(Result::query()->limit(100)->get()),
-            message: 'success',
-        );
+        $validated = $request->validate([
+            'registration_number' => ['sometimes', 'string', 'regex:/^EBSU\-\d{4}\-\d{4,6}[A-Z]?$/'],
+            'department_id' => ['sometimes', 'string', 'regex:/^[0-9]+$/'],
+            'course_id' => ['sometimes', 'string', 'regex:/^[0-9]+$/'],
+            'session' => ['sometimes', 'string', 'regex:/^\d{4}\-\d{4}$/'],
+            'semester' => ['sometimes', 'string', 'in:FIRST,SECOND'],
+            'level' => ['sometimes', 'string', 'regex:/^\d{3}$/'],
+        ]);
+
+        if(count($validated) === 0){
+            return $this->registrations();
+        }
+
+        $department = array_key_exists('department_id', $validated)
+            ? Department::find($validated['department_id'])
+            : null;
+
+        $filter = [];
+
+        foreach($validated as $key => $value){
+            if($key !== 'department_id') {
+                $filter[$key] = Str::replace('-', '/', $value);
+            }
+        }
+
+        return $this->filterRegistration($department, $filter);
     }
 
-    public function courseRegistrationsByRegistrationNumber(string $registrationNumber)
+    private function filterRegistration(?Department $department, array $filters)
     {
-        $registrationNumber = Str::replace('-', '/', $registrationNumber);
+        $query = is_null($department)
+            ? Result::query()
+            : $department->results();
 
-        $results = Result::query()
-            ->where('registration_number', $registrationNumber)
-            ->get();
+        $registrations = $query->where($filters)->get();
 
-        return $this->respondWithSuccess(
-            data: CourseRegistrationResource::collection($results),
-            message: $results->count(),
-        );
+        return is_null($registrations)
+            ? $this->respondNotFound('Course Registration Not Found')
+            : $this->respondWithSuccess(data: CourseRegistrationResource::collection($registrations), message: $registrations->count(),);
     }
 
-    public function courseRegistrationsByDepartmentSessionAndSemester(
-        Department $department,
-        string $session,
-        string $semester
-    ) {
+    private function registrations(): JsonResponse
+    {
+        $registrations = Result::query()->limit(100)->get();
 
-        $session = Str::replace('-', '/', $session);
-
-        $results = $department->results()
-            ->where('session', $session)
-            ->where('semester', $semester)
-            ->get();
-
-        return $this->respondWithSuccess(
-            data: CourseRegistrationResource::collection($results),
-            message: $results->count()
-        );
-
-    }
-
-    public function courseRegistrationsByDepartmentSessionAndLevel(
-        Department $department,
-        string $session,
-        string $level
-    ) {
-
-        $session = Str::replace('-', '/', $session);
-
-        $results = $department->results()
-            ->where('session', $session)
-            ->where('level', $level)
-            ->get();
-
-        return $this->respondWithSuccess(
-            data: CourseRegistrationResource::collection($results),
-            message: $results->count()
-        );
-    }
-
-    public function courseRegistrationBySessionAndCourse(
-        string $session,
-        string $course
-    ) {
-
-        $session = Str::replace('-', '/', $session);
-
-        $results = Result::query()
-            ->where('session', $session)
-            ->where('course_id', $course)
-            ->get();
-
-        return $this->respondWithSuccess(
-            data: CourseRegistrationResource::collection($results),
-            message: $results->count()
-        );
-    }
-
-    public function courseRegistrationBySessionAndSemester(
-        string $session,
-        string $semester
-    ) {
-
-        $session = Str::replace('-', '/', $session);
-
-        $results = Result::query()
-            ->where('session', $session)
-            ->where('semester', $semester)
-            ->get();
-
-        return $this->respondWithSuccess(
-            data: CourseRegistrationResource::collection($results),
-            message: $results->count()
-        );
+        return is_null($registrations)
+            ? $this->respondNotFound('Course Registrations Not Found')
+            : $this->respondWithSuccess(
+                data: CourseRegistrationResource::collection($registrations),
+                message: $registrations->count(),
+            );
     }
 }
