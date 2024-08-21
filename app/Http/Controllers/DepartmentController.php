@@ -4,23 +4,42 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\DepartmentResource;
 use App\Models\Department;
+use Illuminate\Http\Request;
 
 class DepartmentController extends Controller
 {
-    public function index()
+    public function __invoke(Request $request)
     {
+        $data = $request->validate([
+            'department_id' => ['sometimes', 'string', 'regex:/^[0-9]+$/'],
+        ]);
+
+        if(count($data) === 0) {
+            return $this->departments();
+        }
+
+        return $this->departmentById($data['department_id']);
+    }
+
+    public function departments(){
         $departments = Department::all();
 
-        return $this->respondWithSuccess(
+        return is_null($departments)
+            ? $this->respondNotFound("Departments not found")
+            : $this->respondWithSuccess(
             data: DepartmentResource::collection($departments),
             message: $departments->count(),
         );
     }
 
-    public function departmentByCourseId($id)
+    public function departmentById($id)
     {
-        return $this->respondWithSuccess(
-            data: new DepartmentResource(Department::query()->findOrFail($id)),
+        $department = Department::query()->find($id);
+
+        return is_null($department)
+            ? $this->respondNotFound("Department not found")
+            :$this->respondWithSuccess(
+            data: new DepartmentResource($department),
             message: 'success',
         );
     }
