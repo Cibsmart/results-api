@@ -11,8 +11,14 @@ use Illuminate\Support\Str;
 
 class CourseRegistrationController extends Controller
 {
+    private const EXPECTED_KEYS = ['registration_number', 'department_id', 'course_id', 'session', 'semester', 'level'];
+
     public function __invoke(Request $request)
     {
+        if(array_diff(array_keys($request->all()), self::EXPECTED_KEYS)) {
+            return $this->respondError('Invalid parameter(s)');
+        }
+
         $validated = $request->validate([
             'registration_number' => ['sometimes', 'string', 'regex:/^EBSU\-\d{4}\-\d{4,6}[A-Z]?$/'],
             'department_id' => ['sometimes', 'string', 'regex:/^[0-9]+$/'],
@@ -21,6 +27,7 @@ class CourseRegistrationController extends Controller
             'semester' => ['sometimes', 'string', 'in:FIRST,SECOND'],
             'level' => ['sometimes', 'string', 'regex:/^\d{3}$/'],
         ]);
+
 
         if(count($validated) === 0){
             return $this->registrations();
@@ -49,7 +56,7 @@ class CourseRegistrationController extends Controller
 
         $registrations = $query->where($filters)->get();
 
-        return is_null($registrations)
+        return $registrations->isEmpty()
             ? $this->respondNotFound('Course Registration Not Found')
             : $this->respondWithSuccess(data: CourseRegistrationResource::collection($registrations), message: $registrations->count(),);
     }
@@ -58,11 +65,8 @@ class CourseRegistrationController extends Controller
     {
         $registrations = Result::query()->limit(100)->get();
 
-        return is_null($registrations)
+        return $registrations->isEmpty()
             ? $this->respondNotFound('Course Registrations Not Found')
-            : $this->respondWithSuccess(
-                data: CourseRegistrationResource::collection($registrations),
-                message: $registrations->count(),
-            );
+            : $this->respondWithSuccess(data: CourseRegistrationResource::collection($registrations), message: $registrations->count(),);
     }
 }
